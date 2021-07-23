@@ -14,7 +14,7 @@ class ePaycoController extends Controller
     
     public function __construct()
     {
-        // $this->middleware( 'auth:api', ['only' => ['store', 'update','destroy']] );
+        $this->middleware( 'jwt.verify' );
         $this->epayco = new Epayco(array(
             "apiKey" => "12d555da4bacf9ebd63c1c50a178e52c",
             "privateKey" => "0192e3a2ca5864818acabaeba7b5030d",

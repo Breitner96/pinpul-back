@@ -2,18 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use JWTAuth;
 use App\User;
 use Carbon\Carbon;
+use App\Traits\Utilities;
 use App\Entities\Provider;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Auth;
-use JWTAuth;
 use Tymon\JWTAuth\Exceptions\JWTException;
-
-use Illuminate\Support\Str;
-
-use App\Traits\Utilities;
+use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
@@ -62,26 +61,47 @@ class AuthController extends Controller
             } catch (Tymon\JWTAuth\Exceptions\JWTException $e) {
                     return response()->json(['token_absent'], $e->getStatusCode());
             }
-            return response()->json(compact('user'));
+            return response()->json([
+                'access_token' => $token,
+                // 'token_type' => 'bearer',
+                'user' => $this->me()->original,
+                'rol' => $this->me()->original->rol,
+                // 'permissions' => $this->me()->original->permissions
+            ]);
     }
 
     public function register(Request $request)
     {
-            $validator = Validator::make($request->all(), [
+
+        $rules = [
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:6|confirmed',
-        ]);
+            'password' => 'required|string|min:6|confirmed'
+        ];
+
+        $messages = [
+            'required' => 'El :attribute es requerido',
+            'email' => 'El :attribute debe ser un email válido',
+            'confirmed' => 'Las contraseñas no coinciden'
+        ];
+
+        $validator = Validator::make($request->all(), $rules, $messages);
 
         if($validator->fails()){
-                return response()->json($validator->errors()->toJson(), 400);
+            return response()->json($validator->errors()->toJson(), 400);
         }
 
         $user = User::create([
             'name' => $request->get('name'),
             'email' => $request->get('email'),
-            'password' => Hash::make($request->get('password')),
+            'password' => bcrypt($request->get('password')),
         ]);
+
+        if( $request->type_user == true ){
+            $user->assignRole( 'proveedor' );
+        } else {
+            $user->assignRole( 'cliente' );
+        }
 
         $token = JWTAuth::fromUser($user);
 

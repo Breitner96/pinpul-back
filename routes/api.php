@@ -2,7 +2,7 @@
 
 use Illuminate\Http\Request;
 
-Route::post('register', 'AuthController@signup');
+Route::post('register', 'AuthController@register');
 Route::post('login', 'AuthController@authenticate');
 
 // Módulo de categorias
