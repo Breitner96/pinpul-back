@@ -97,7 +97,7 @@ class AuthController extends Controller
             'password' => bcrypt($request->get('password')),
         ]);
 
-        if( $request->type_user == true ){
+        if( $request->type_user != null ){
             $user->assignRole( 'proveedor' );
         } else {
             $user->assignRole( 'cliente' );
