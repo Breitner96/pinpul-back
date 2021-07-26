@@ -94,32 +94,86 @@ class CategoryController extends Controller
     public function slug($name)
     {
         // return $name;
-        // $categories = Category::where('slug',$name)->get();
-        // $data['providers'] = $categories->providers;
-        // $views = $categories->views + 1;
-        // DB::update( "UPDATE categories SET views = $views WHERE id = $categories->id" );
-
-        // $abc = $data['providers'] = $categories->providers;
-        // foreach($abc as $a){
-        //     $data['categories'] = $a->categories;
-        // }
-        // return $categories;
-
-        /* Otra opción */
-        $categories = Category::where('slug',$name)->get();
-        $id = $categories[0]->id;
+        $categories = DB::select("SELECT * FROM categories WHERE slug = '$name' ");
+        $idCategory = $categories[0]->id;
         $views = $categories[0]->views + 1;
-        DB::update( "UPDATE categories SET views = $views WHERE id = $id" );
+        DB::update( "UPDATE categories SET views = $views WHERE id = $idCategory" );
+
+        $providers = DB::select("
+            SELECT * FROM category_providers
+            INNER JOIN categories ON categories.id = category_providers.category_id
+            INNER JOIN providers ON providers.id = category_providers.provider_id
+            WHERE categories.slug = '$name'
+            AND providers.state = 'activo'
+        ");
+
         $data = [];
-        foreach($categories as $category){
-            $providers = $category->providers;
+        foreach($providers as $provider){
+            $data = DB::select("
+                SELECT * FROM category_providers
+                INNER JOIN providers ON providers.id = category_providers.provider_id
+                INNER JOIN categories ON categories.id = $idCategory
+                WHERE providers.id = $provider->id
+            ");
         }
-        $proveedor = Provider::where('state','activo')->get();
-        return $proveedor;
-        // return response()->json([
-        //     'proveedor' => $proveedor,
-        //     'categorias' => $categories
-        // ]);
+
+
+        return response()->json([
+            'providers' => $providers,
+            'categories' => $data
+        ]);
+        // return $abc;
+        // return $categoriesProviders;
+
+
+
+        // $categoriesProviders = DB::select("
+        //     SELECT
+        //     category_providers.id AS IDPROVIDERPIVOT,
+        //     category_providers.category_id AS IDCATEGORYPIVOT,
+        //     category_providers.provider_id AS IDPROVIDERPIVOT,
+        //     categories.id AS CATEGORYID,
+        //     categories.slug AS SLUGCATEGORY,
+        //     categories.*,
+        //     providers.id AS PROVIDERID,
+        //     providers.slug AS SLUGPROVIDER,
+        //     providers.*
+        //     FROM category_providers
+        //     INNER JOIN categories ON categories.id = category_providers.category_id
+        //     INNER JOIN providers ON providers.id = category_providers.provider_id
+        //     WHERE category_providers.category_id = $idCategory
+        //     AND providers.state = 'activo'
+        //     AND categories.slug = 'cuero'
+        // ");
+
+        
+
+
+        // $categories = Category::where('slug',$name)->get();
+        // $id = $categories[0]->id;
+        // $views = $categories[0]->views + 1;
+        // DB::update( "UPDATE categories SET views = $views WHERE id = $id" );
+        // $data = [];
+        // foreach($categories as $category){
+        //     $data['provider'] = $category->providers->where('state','activo');
+        // }
+
+        // if( count( $data['provider'] ) > 0 ) {
+        //     $idProvider = $data['provider'][0]->id;
+        //     $provider = Provider::where('id',$id)->get();
+        //     $categoriesProviders = [];
+        //     foreach($provider as $prov){
+        //         $categoriesProviders['catProvider'] = $prov->categories;
+        //     }
+    
+        //     return response()->json([
+        //         'providers' => $data['provider'],
+        //         'categories' => $categoriesProviders
+        //     ]);
+        // } else {
+        //     return response()->json(['No existen proveedores en esta categoría']);
+        // }
+
     }
 
     /**

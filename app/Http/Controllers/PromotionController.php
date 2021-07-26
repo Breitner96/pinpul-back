@@ -37,6 +37,18 @@ class PromotionController extends Controller
         return $promotions;
     }
 
+    public function promotionByProvider($id){
+        $promotions = Promotion::where('provider_id', $id)->get();
+        $star = date("Y-m-d");
+        foreach ($promotions as $array) {
+            $end = date("$array->end_promotion");
+            if($star > $end){
+                $sql = DB::update("UPDATE promotions SET status = 'inactivo' WHERE id = $array->id");
+            } 
+        }
+        return $promotions;
+    }
+
     /**
      * Store a newly created resource in storage.
      *

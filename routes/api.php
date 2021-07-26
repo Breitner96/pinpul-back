@@ -47,6 +47,7 @@ Route::resource('plans', 'PlanController')->except(['create', 'edit']);
 
 // Módulo de promociones
 Route::resource('promotions', 'PromotionController')->except(['create', 'edit']);
+Route::get('promotions-provider/{id}', 'PromotionController@promotionByProvider');
 
 // Módulo de proveedores
 Route::resource('providers', 'ProviderController')->except(['create', 'edit']);

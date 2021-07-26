@@ -91,29 +91,19 @@ class ProviderController extends Controller
      */
     public function store(Request $request)
     {
-
-        $data = $request->all();
-        
+        $data = $request->all();        
 
         $rol = $this->userActive();
         if( in_array( $rol, $this->returnRoles() ) ){
+            
 
-        
-            // return $request;
             // /* Obtener categorías */
             $categories = explode(',',$request->category_id);
-            
-            // /* Obtener servicios */
-            // $services = explode(',',$request->service_id);
-
-            // /* Obtener Tipos de compañias*/
-            // $companies = explode(',',$request->type_company_id);
 
             // /* Obtener Tipos de clientes */
             $clients = explode(',',$request->type_client_id);
-            
             // /* Obtener paises */
-            $countries = explode(',',$request->countries_id);  
+            $countries = explode(',',$request->countries_id); 
 
             // /* Obtener ciudades */
             $cities = explode(',',$request->cities_id);
@@ -135,8 +125,6 @@ class ProviderController extends Controller
             $fileName = time().'.'.$request->logo->extension();
             $request->logo->move(public_path('img'), $fileName);
 
-            // $data = $request->all();
-
             $data['user_id'] = $userLoggedIn = auth()->user()->id;
             $data['logo'] = $fileName;
             $data['slug'] = Str::slug($request->provider);
@@ -145,8 +133,6 @@ class ProviderController extends Controller
 
             $providerAdded = Provider::find($provider->id);
             $providerAdded->categories()->attach($categories);
-            // $providerAdded->services()->attach($services);
-            // $providerAdded->companies()->attach($companies);
             $providerAdded->clients()->attach($clients);
             $providerAdded->countries()->attach($countries);
             $providerAdded->cities()->attach($cities);
@@ -260,12 +246,11 @@ class ProviderController extends Controller
 
     public function slug($name)
     {
-        // $provider = Provider::where('slug',$name)->where('state','activo')->first();
-        $provider = Provider::where('slug',$name)->first();
+        $provider = Provider::where('slug',$name)->where('state','activo')->first();
+        $providerDos = Provider::where('slug',$name)->where('state','activo')->get();
+        // $provider = Provider::where('slug',$name)->first();
         $data = $provider;
         $data['categories'] = $provider->categories;
-        $data['services'] = $provider->services;
-        $data['companies'] = $provider->companies;
         $data['clients'] = $provider->clients;
         $data['countries'] = $provider->countries;
         $data['cities'] = $provider->cities;
@@ -276,28 +261,18 @@ class ProviderController extends Controller
         $data['plan'] = $provider->plan;
         $views = $data['views'] + 1;
 
-        $categories = $provider->categories;
-        $argCategories = [];
-        foreach($categories as $category){
-            $argCategories[] = $category->category;
-            // return $argCategories;
-        }
-        $categoriesRand = array_rand($argCategories, 1);
+        // $sql = DB::select("SELECT * FROM providers WHERE state = 'activo'");
+        // foreach($data->categories as $categories){
+        //     return $sql;
+        // }
 
-        $categories = Category::where('category',$categoriesRand)->limit(3)->get();
-        $promotions = Promotion::where('provider_id',$data->id)->get();
-        $dataDos = [];
-        foreach($categories as $category){
-            $dataDos['providers'] = $category->providers;
-        }
-
-        // $this->proveedoresInteres($argCategories);
-        DB::update( "UPDATE providers SET views = $views WHERE id = $data->id" );
 
         return response()->json([
-            'provider' => $provider,
-            'interes' => $categories,
-            'promotions' => $promotions
+            'provider' => $data,
+            'interes' => $providerDos,
+            // 'interes' => $data['categories'][0]->providers->where('state','activo'),
+            // 'promotions' => $promotions
+            // 'categories' => $data['categories']
         ]);
 
         return $provider;
@@ -348,9 +323,9 @@ class ProviderController extends Controller
      */
     public function update(Request $request, Provider $provider)
     {
-        // return $request->all();
         $rol = $this->userActive();
         if( in_array( $rol, $this->returnRoles() ) ){
+            // return $request->all();
 
         
             $data = $request->all();
@@ -370,50 +345,87 @@ class ProviderController extends Controller
                 ]);
             }
 
+
             if($request->logo == null){
+                // $category->category = $request->category;
+                $provider->logo = $provider->logo;
+                // $category->slug = Str::slug($request->category);
+                // $category->views = $category->views;
+                // $category->save();
 
                 $categories = explode(',',$request->category_id);
-                // $services = explode(',',$request->service_id);
-                // $companies = explode(',',$request->type_company_id);
                 $clients = explode(',',$request->type_client_id);
-                $countries = explode(',',$request->countries_id);  
+                $countries = explode(',',$request->countries_id); 
                 $cities = explode(',',$request->cities_id);  
 
-        
-                $data['logo'] = $provider->logo;
-                $data['slug'] = Str::slug($request->provider);
-        
-                $provider->update( $data );
                 $provider->categories()->sync($categories);
-                // $provider->services()->sync($services);
-                // $provider->companies()->sync($companies);
                 $provider->clients()->sync($clients);
                 $provider->countries()->sync($countries);
                 $provider->cities()->sync($cities);
-                
+
+                $provider->update( $request->all() );
+                // $provider->save();
             } else {
-                /* Obtener imagen */
                 $fileName = time().'.'.$request->logo->extension();
                 $request->logo->move(public_path('img'), $fileName);
-        
+
                 $categories = explode(',',$request->category_id);
-                // $services = explode(',',$request->service_id);
-                // $companies = explode(',',$request->type_company_id);
                 $clients = explode(',',$request->type_client_id);
-                $countries = explode(',',$request->countries_id);  
+                $countries = explode(',',$request->countries_id); 
                 $cities = explode(',',$request->cities_id);  
 
-                $data['logo'] = $fileName;
-                $data['slug'] = Str::slug($request->provider);
-        
-                $provider->update( $data );
                 $provider->categories()->sync($categories);
-                // $provider->services()->sync($services);
-                // $provider->companies()->sync($companies);
                 $provider->clients()->sync($clients);
                 $provider->countries()->sync($countries);
                 $provider->cities()->sync($cities);
+                $provider->update( $request->all() );
+                // $provider->save();
             }
+
+            // if($request->logo == null){
+            //     $data['logo'] = $provider->logo;
+
+            //     // $categories = explode(',',$request->category_id);
+            //     // $services = explode(',',$request->service_id);
+            //     // $companies = explode(',',$request->type_company_id);
+            //     // $clients = explode(',',$request->type_client_id);
+            //     // $countries = explode(',',$request->countries_id);  
+            //     // $cities = explode(',',$request->cities_id);  
+
+        
+            //     // $data['slug'] = Str::slug($request->provider);
+        
+            //     // $provider->update( $data );
+            //     // $provider->categories()->sync($categories);
+            //     // $provider->services()->sync($services);
+            //     // $provider->companies()->sync($companies);
+            //     // $provider->clients()->sync($clients);
+            //     // $provider->countries()->sync($countries);
+            //     // $provider->cities()->sync($cities);
+                
+            // } else {
+        
+            //     $categories = explode(',',$request->category_id);
+            //     $clients = explode(',',$request->type_client_id);
+            //     $countries = explode(',',$request->countries_id);  
+            //     $cities = explode(',',$request->cities_id);
+
+            //     /* Obtener imagen */
+            //     $fileName = time().'.'.$request->logo->extension();
+            //     $request->logo->move(public_path('img'), $fileName);
+            //     $data['logo'] = $fileName;
+
+            //     $data['slug'] = Str::slug($request->provider);
+
+            //     $provider->save( $data );
+            //     $provider->categories()->sync($categories);
+            //     $provider->clients()->sync($clients);
+            //     $provider->countries()->sync($countries);
+            //     $provider->cities()->sync($cities);
+
+            //     // $provider->update( $data );
+            // }
+
 
             $providerAdded = Provider::find($provider->id);
 
@@ -450,7 +462,8 @@ class ProviderController extends Controller
             }
             
             return response()->json([
-                'messages' => 'Provider has been updated'
+                'messages' => 'Provider has been updated',
+                'datos' => $provider
             ]);
         }else {
             return response()->json([
