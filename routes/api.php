@@ -16,6 +16,7 @@ Route::resource('categories_services', 'CategoryController')->except(['create', 
 
 // Módulo de ciudades
 Route::resource('cities', 'CityController')->except(['create', 'edit']);
+Route::get('cities-country/{id}', 'CityController@cityByCountry');
 
 // Contador por mes
 Route::post('contador-mes-gratis', 'ProviderController@contadorMesGratis');
