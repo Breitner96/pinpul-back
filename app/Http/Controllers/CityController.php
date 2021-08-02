@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Entities\City;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\DB;
 use App\Traits\Utilities;
 
 class CityController extends Controller
@@ -64,6 +64,25 @@ class CityController extends Controller
     public function show(City $city)
     {
         return $city;
+    }
+
+    public function cityByCountry($id){
+        $cities = City::where('country_id',$id)->get();
+        return $cities;
+
+
+        // $ids = [1,3];
+        // $data = [];
+        // for($i = 0; $i <= count($ids) - 1; $i++ ){
+        //     $sql = DB::select("SELECT * FROM cities WHERE country_id LIKE $ids[$i]");
+        //     $data = $sql;
+        // }
+        // return $data;
+
+    }
+
+    public function countryByCities($id){
+        
     }
 
     /**
