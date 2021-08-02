@@ -24,7 +24,7 @@ class AuthController extends Controller
         $credentials = $request->only('email', 'password');
         try {
             if (! $token = JWTAuth::attempt($credentials)) {
-                return response()->json(['error' => 'invalid_credentials'], 400);
+                return response()->json(['errorLogin' => 'invalid_credentials']);
             }
         } catch (JWTException $e) {
             return response()->json(['error' => 'could_not_create_token'], 500);
@@ -57,16 +57,14 @@ class AuthController extends Controller
             } catch (Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {
                     return response()->json(['token_expired'], $e->getStatusCode());
             } catch (Tymon\JWTAuth\Exceptions\TokenInvalidException $e) {
-                    return response()->json(['token_invalid'], $e->getStatusCode());
+                    return response()->json(['error']);
             } catch (Tymon\JWTAuth\Exceptions\JWTException $e) {
                     return response()->json(['token_absent'], $e->getStatusCode());
             }
             return response()->json([
                 'access_token' => $token,
-                // 'token_type' => 'bearer',
                 'user' => $this->me()->original,
                 'rol' => $this->me()->original->rol,
-                // 'permissions' => $this->me()->original->permissions
             ]);
     }
 

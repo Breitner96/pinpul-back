@@ -248,7 +248,20 @@ class ProviderController extends Controller
     {
         $provider = Provider::where('slug',$name)->where('state','activo')->first();
         $providerDos = Provider::where('slug',$name)->where('state','activo')->get();
-        // $provider = Provider::where('slug',$name)->first();
+
+        $interes = [];
+        foreach($provider->categories as $c){
+            $sql ="
+                SELECT * FROM category_providers
+                INNER JOIN providers ON providers.id = category_providers.provider_id
+                INNER JOIN categories ON categories.id = category_providers.category_id
+                WHERE categories.id = $c->id
+                ORDER BY category_providers.provider_id
+                LIMIT 3
+            ";
+            $interes = DB::select($sql);
+        }
+
         $data = $provider;
         $data['categories'] = $provider->categories;
         $data['clients'] = $provider->clients;
@@ -261,21 +274,10 @@ class ProviderController extends Controller
         $data['plan'] = $provider->plan;
         $views = $data['views'] + 1;
 
-        // $sql = DB::select("SELECT * FROM providers WHERE state = 'activo'");
-        // foreach($data->categories as $categories){
-        //     return $sql;
-        // }
-
-
         return response()->json([
             'provider' => $data,
-            'interes' => $providerDos,
-            // 'interes' => $data['categories'][0]->providers->where('state','activo'),
-            // 'promotions' => $promotions
-            // 'categories' => $data['categories']
+            'interes' => $interes,
         ]);
-
-        return $provider;
     }
 
     public function peopleCount(Request $request){
