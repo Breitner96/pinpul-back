@@ -18,6 +18,4 @@ class Category extends Model
         return $this->belongsToMany(Provider::class,'category_providers');
     }
 
- 
-
 }

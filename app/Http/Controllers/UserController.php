@@ -122,8 +122,13 @@ class UserController extends Controller
             }
             
             $user->update( $data );
-
             $user->syncRoles( $request->rol_id );
+
+            // if( $user->rol[0]->name == 'gerencia' ){
+            //     $user->syncRoles( $request->rol_id );
+            // }            
+            // return $user->rol[0]->name;
+
             
             return response()->json([
                 'messages' => 'User has been updated'

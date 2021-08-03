@@ -13,52 +13,32 @@ class CategoryTableSeeder extends Seeder
     public function run()
     {
         Category::create([
-            'category' => 'Confección',
-            'imagen' => 'at_01.jpg',
-            'slug' => 'confeccion',
+            'category' => 'Bares y restaurantes',
+            'imagen' => '1627335628.jpg',
+            'slug' => 'bares-y-restaurantes',
             'views' => 0
         ]);
 
         Category::create([
-            'category' => 'Cortes',
-            'imagen' => 'at_02.jpg',
-            'slug' => 'cortes',
+            'category' => 'Cuero',
+            'imagen' => '1627335640.jpg',
+            'slug' => 'cuero',
             'views' => 0
         ]);
 
         Category::create([
-            'category' => 'Desarrollo',
-            'imagen' => 'at_03.jpg',
-            'slug' => 'desarrollo',
+            'category' => 'Tecnología',
+            'imagen' => '1627335653.jpg',
+            'slug' => 'tecnologia',
             'views' => 0
         ]);
 
         Category::create([
-            'category' => 'Ropa',
-            'imagen' => 'at_04.jpg',
-            'slug' => 'ropa',
+            'category' => 'Ropa y textil',
+            'imagen' => '1627335665.jpg',
+            'slug' => 'ropa-y-textil',
             'views' => 0
         ]);
 
-        Category::create([
-            'category' => 'Uniforme',
-            'imagen' => 'rm_01.jpg',
-            'slug' => 'uniforme',
-            'views' => 0
-        ]);
-
-        Category::create([
-            'category' => 'Diseño',
-            'imagen' => 'rm_02.jpg',
-            'slug' => 'diseno',
-            'views' => 0
-        ]);
-
-        Category::create([
-            'category' => 'Marketing',
-            'imagen' => 'rm_03.jpg',
-            'slug' => 'marketing',
-            'views' => 0
-        ]);
     }
 }

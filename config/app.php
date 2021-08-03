@@ -178,6 +178,7 @@ return [
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
+        Biscolab\ReCaptcha\ReCaptchaServiceProvider::class,
     ],
 
     /*
@@ -235,6 +236,7 @@ return [
         'PDF' => Barryvdh\DomPDF\Facade::class,
         'JWTAuth' => Tymon\JWTAuth\Facades\JWTAuth::class, 
         'JWTFactory' => Tymon\JWTAuth\Facades\JWTFactory::class,
+        'ReCaptcha' => Biscolab\ReCaptcha\Facades\ReCaptcha::class,
     ],
 
 ];

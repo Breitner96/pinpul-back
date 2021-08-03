@@ -9,6 +9,34 @@ use Mail;
 
 class EmailControllers extends Controller
 {
+
+    public function isReCaptchaValid($rcToken){
+
+        $client = new Client([
+            'base_uri' => 'https://google.com/recaptcha/api/',
+            'timeout' => 5.0
+        ]);
+    
+        $response = $client->request('POST', 'siteverify', [
+            'query' => [
+                'secret' => config('app.reCaptchaSecretKey'),
+                'response' => $rcToken
+            ]
+        ]);
+    
+        $data = json_decode($response->getBody());
+    
+        if($data->success && $data->score >= 0.5){
+    
+            return true;
+    
+        }
+    
+        return false;
+    
+    
+    }
+
     public function contactProvider(Request $request)
     {
         // return $request;

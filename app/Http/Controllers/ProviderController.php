@@ -247,6 +247,8 @@ class ProviderController extends Controller
     public function slug($name)
     {
         $provider = Provider::where('slug',$name)->where('state','activo')->first();
+        $views = $provider->views + 1;
+        DB::update("UPDATE providers SET views = $views WHERE slug = '$name'");
         $providerDos = Provider::where('slug',$name)->where('state','activo')->get();
 
         $interes = [];
@@ -278,6 +280,10 @@ class ProviderController extends Controller
             'provider' => $data,
             'interes' => $interes,
         ]);
+    }
+
+    public function getProviderByCity(){
+        
     }
 
     public function peopleCount(Request $request){

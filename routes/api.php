@@ -5,6 +5,9 @@ use Illuminate\Http\Request;
 Route::post('register', 'AuthController@register');
 Route::post('login', 'AuthController@authenticate');
 
+// Módulo de Blos
+Route::resource('blogs', 'BlogController')->except(['create', 'edit']);
+
 // Módulo de categorias
 Route::resource('categories', 'CategoryController')->except(['create', 'edit']);
 
